@@ -1,0 +1,40 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'ru.upravsim.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'ru.upravsim.app'
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName '1.0'
+    }
+
+    // Постоянный ключ подписи берётся из секрета KEYSTORE_B64 (в репозиторий не кладётся).
+    // С ним обновления ставятся поверх старой версии, и сохранения не теряются.
+    def ks = file('upravsim.keystore')
+    signingConfigs {
+        main {
+            storeFile ks
+            storePassword System.getenv('KS_PASS') ?: 'upravsim'
+            keyAlias 'upravsim'
+            keyPassword System.getenv('KS_PASS') ?: 'upravsim'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig ks.exists() ? signingConfigs.main : signingConfigs.debug
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
